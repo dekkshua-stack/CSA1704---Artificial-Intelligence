@@ -1,0 +1,163 @@
+from collections import deque
+import heapq
+def doctor_scheduling():
+    doctors = ["D1", "D2", "D3"]
+    shifts = ["Morning", "Afternoon", "Night"]
+    assignment = {}
+    def is_valid(doctor, shift):
+        if doctor == "D1" and shift == "Night":
+            return False
+        if doctor == "D3" and shift == "Morning":
+            return False
+        if shift in assignment.values():
+            return False
+        return True
+    def backtrack(index):
+        if index == len(doctors):
+            order = {"Morning": 0, "Afternoon": 1, "Night": 2}
+            return order[assignment["D2"]] < order[assignment["D3"]]
+        doctor = doctors[index]
+        for shift in shifts:
+            if is_valid(doctor, shift):
+                assignment[doctor] = shift
+                if backtrack(index + 1):
+                    return True
+                del assignment[doctor]
+        return False
+    print("\nDoctor Scheduling using Backtracking\n")
+    if backtrack(0):
+        print("Valid Schedule")
+        for doctor in doctors:
+            print(doctor, "->", assignment[doctor])
+    else:
+        print("No valid schedule found")
+def bfs_robot():
+    grid = [
+        ['S','.','.','X','.'],
+        ['.','X','.','X','.'],
+        ['.','X','.','.','.'],
+        ['.','.','X','X','.'],
+        ['X','.','.','.','G']
+    ]
+    rows = len(grid)
+    cols = len(grid[0])
+    start = (0,0)
+    goal = (4,4)
+    moves = [(0,1),(1,0),(0,-1),(-1,0)]
+    queue = deque()
+    queue.append((start,[start]))
+    visited = set()
+    visited.add(start)
+    print("\nRobot Navigation using BFS\n")
+    while queue:
+        current,path = queue.popleft()
+        if current==goal:
+            print("Shortest Path")
+            print(path)
+            print("Total Cost =",len(path)-1)
+            return
+        x,y=current
+        for dx,dy in moves:
+            nx=x+dx
+            ny=y+dy
+            if 0<=nx<rows and 0<=ny<cols:
+                if grid[nx][ny]!='X' and (nx,ny) not in visited:
+                    visited.add((nx,ny))
+                    queue.append(((nx,ny),path+[(nx,ny)]))
+def rescue_robot():
+    grid = [
+        ['S','.','R','.','.'],
+        ['.','X','.','X','.'],
+        ['.','.','.','R','.'],
+        ['X','.','X','.','.'],
+        ['.','.','.','.','G']
+    ]
+    rows=len(grid)
+    cols=len(grid[0])
+    start=(0,0)
+    goal=(4,4)
+    moves=[(0,1),(1,0),(0,-1),(-1,0)]
+    pq=[]
+    heapq.heappush(pq,(0,start,[start]))
+    visited={}
+    print("\nAutonomous Rescue Robot using Uniform Cost Search\n")
+    while pq:
+        cost,current,path=heapq.heappop(pq)
+        if current==goal:
+            print("Goal Reached")
+            print("Path =",path)
+            print("Minimum Cost =",cost)
+            return
+        if current in visited and visited[current]<=cost:
+            continue
+        visited[current]=cost
+        x,y=current
+        for dx,dy in moves:
+            nx=x+dx
+            ny=y+dy
+            if 0<=nx<rows and 0<=ny<cols:
+                if grid[nx][ny]!='X':
+                    new_cost=cost+1
+                    if grid[nx][ny]=='R':
+                        new_cost+=2
+                    heapq.heappush(
+                        pq,
+                        (new_cost,(nx,ny),path+[(nx,ny)])
+                    )
+def fraud_detection():
+    print("\nFraud Detection System\n")
+    amount=float(input("Enter Transaction Amount: "))
+    location=input("Enter Location (Local/Foreign): ")
+    frequency=int(input("Enter Number of Transactions Today: "))
+    if amount>10000 or location.lower()=="foreign" or frequency>5:
+        print("\nTransaction Status : Fraudulent")
+    else:
+        print("\nTransaction Status : Legitimate")
+def convex_hull():
+    def orientation(p,q,r):
+        return (q[1]-p[1])*(r[0]-q[0])-(q[0]-p[0])*(r[1]-q[1])
+    points=[(1,1),(2,5),(5,3),(3,2),(4,6),(6,1)]
+    n=len(points)
+    hull=[]
+    print("\nBrute Force Convex Hull\n")
+    for i in range(n):
+        for j in range(i+1,n):
+            left=0
+            right=0
+            for k in range(n):
+                if k==i or k==j:
+                    continue
+                value=orientation(points[i],points[j],points[k])
+                if value>0:
+                    left+=1
+                elif value<0:
+                    right+=1
+            if left==0 or right==0:
+                hull.append((points[i],points[j]))
+    print("Convex Hull Edges")
+    for edge in hull:
+        print(edge)
+while True:
+    print("\n========== AI Assessment ==========")
+    print("1. Hospital Doctor Scheduling")
+    print("2. Robot Navigation using BFS")
+    print("3. Autonomous Rescue Robot")
+    print("4. Fraud Detection System")
+    print("5. Convex Hull using Brute Force")
+    print("6. Exit")
+    choice=input("\nEnter your choice : ")
+    if choice=="1":
+        doctor_scheduling()
+    elif choice=="2":
+        bfs_robot()
+    elif choice=="3":
+        rescue_robot()
+    elif choice=="4":
+        fraud_detection()
+    elif choice=="5":
+        convex_hull()
+    elif choice=="6":
+        print("\nProgram Ended")
+        break
+    else:
+        print("\nInvalid Choice")
